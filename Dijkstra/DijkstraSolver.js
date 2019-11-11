@@ -48,8 +48,7 @@ class Graph {
 
 class DijkstraSolver {
 
-  solve() {
-    const inputGraph = this.readGraph();
+  solve(inputGraph) {
     const graph = new Graph(inputGraph);
     let node = graph.getLowestCostNode();
     while (node) {
@@ -68,22 +67,27 @@ class DijkstraSolver {
     console.log(graph.costs);
     console.log(graph.parents);
   }
-
-  readGraph() {
-    const graph = {
-      S: { A: 5, B: 2 },
-      A: { C: 4, D: 2 },
-      B: { A: 8, D: 7 },
-      C: { D: 6, F: 3 },
-      D: { F: 1 },
-      F: {}
-    };
-    const fileName = 'input.txt';
-    const encoding = { encoding: 'uft-8' };
-
-    return graph;
-  }
 }
 
 const solver = new DijkstraSolver();
-solver.solve();
+readGraph();
+
+function readGraph(config = 'utf-8') {
+  let graph = {};
+  const fileName = 'homework/Dijkstra/input.txt';
+  fs.readFile(fileName, { encoding: config }, (err, data) => {
+    if (err) { console.error(err); return; }
+    data.split('\n').forEach(el => {
+      let [vertex, edges] = el.split(' ');
+      let edgesObj = {};
+      if (edges !== undefined) {
+        edges.split(',').forEach(e => {
+          let [toVertex, weight] = e.split(':');
+          edgesObj[toVertex] = +weight;
+        })
+      }
+      graph[vertex] = edgesObj;
+    });
+    solver.solve(graph);
+  })
+}
